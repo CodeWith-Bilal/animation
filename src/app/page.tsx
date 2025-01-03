@@ -339,7 +339,6 @@ export default function ChatBotWithVoice() {
       ]);
     }
   };
-//
   const stopListening = () => {
     console.log("stopListening called");
     if (recognitionRef.current) {
@@ -405,7 +404,7 @@ export default function ChatBotWithVoice() {
     console.log("handleVoiceInput called, isRecording:", isRecording);
     if (!isRecording) {
       setShowRiveAnimation(true); // Show Rive animation when mic is clicked
-      updateRiveInputs(true, true, 30, true); // Set start voice to true and voice control to 30
+      updateRiveInputs(true, true, 30, true);
       startListening();
     } else {
       setShowRiveAnimation(false);
