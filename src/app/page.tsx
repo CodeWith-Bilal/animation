@@ -183,7 +183,7 @@ export default function ChatBotWithVoice() {
   useEffect(() => {
     if (!rive) return;
     if (isRecording) {
-      updateRiveInputs(true, true, 30, true); // Set voice control to 30 when recording
+      updateRiveInputs(true, true, 30, true);
     } else if (isProcessing) {
       updateRiveInputs(true, false, 0, false);
     } else {
