@@ -339,7 +339,7 @@ export default function ChatBotWithVoice() {
       ]);
     }
   };
-
+//
   const stopListening = () => {
     console.log("stopListening called");
     if (recognitionRef.current) {
