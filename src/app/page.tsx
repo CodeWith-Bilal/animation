@@ -6,8 +6,8 @@ import { Mic, User, Volume2, Send } from "lucide-react";
 
 const STATE_MACHINE = "State Machine 1";
 const LISTENING_INPUT = "start voice ";
-const GLOW_INPUT = "glow";
-const VOICE_CONTROL_INPUT = "voice control";
+const GLOW_INPUT = "glow ";
+const VOICE_CONTROL_INPUT = "voice control ";
 const GLOW_ROTATE_INPUT = "glow rotate";
 
 interface Message {
@@ -18,7 +18,8 @@ interface Message {
 }
 
 // Generate unique IDs to avoid collisions
-const generateUniqueId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateUniqueId = () =>
+  `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // Format time consistently for server and client
 const formatTime = (date: Date) => {
@@ -31,9 +32,15 @@ const formatTime = (date: Date) => {
 };
 
 // Separate RiveAvatar component to avoid nesting
-const RiveAvatar = ({ isActive, isProcessing }: { isActive: boolean; isProcessing: boolean }) => {
+const RiveAvatar = ({
+  isActive,
+  isProcessing,
+}: {
+  isActive: boolean;
+  isProcessing: boolean;
+}) => {
   const { rive, RiveComponent } = useRive({
-    src: "https://public.rive.app/community/runtime-files/21478-40369-ai-voice-tm.riv",
+    src: "https://public.rive.app/community/runtime-files/21478-40413-ai-voice-tm.riv",
     stateMachines: "State Machine 1",
     autoplay: true,
     onLoadError: (error) => {
@@ -44,10 +51,22 @@ const RiveAvatar = ({ isActive, isProcessing }: { isActive: boolean; isProcessin
     },
   });
 
-  const avatarInput = useStateMachineInput(rive, "State Machine 1", "start voice ");
-  const glowInput = useStateMachineInput(rive, "State Machine 1", "glow");
-  const voiceControlInput = useStateMachineInput(rive, "State Machine 1", "voice control");
-  const glowRotateInput = useStateMachineInput(rive, "State Machine 1", "glow rotate");
+  const avatarInput = useStateMachineInput(
+    rive,
+    "State Machine 1",
+    "start voice "
+  );
+  const glowInput = useStateMachineInput(rive, "State Machine 1", "glow ");
+  const voiceControlInput = useStateMachineInput(
+    rive,
+    "State Machine 1",
+    "voice control "
+  );
+  const glowRotateInput = useStateMachineInput(
+    rive,
+    "State Machine 1",
+    "glow rotate"
+  );
 
   useEffect(() => {
     if (avatarInput) {
@@ -59,14 +78,21 @@ const RiveAvatar = ({ isActive, isProcessing }: { isActive: boolean; isProcessin
       console.log("Avatar glow input updated:", isActive);
     }
     if (voiceControlInput) {
-      voiceControlInput.value = isActive ? 30 : 0; // Set voice control to 30 when active
-      console.log("Avatar voice control input updated:", isActive ? 30 : 0);
+      voiceControlInput.value = isActive ? 50 : 0; // Set voice control to 30 when active
+      console.log("Avatar voice control input updated:", isActive ? 50 : 0);
     }
     if (glowRotateInput) {
       glowRotateInput.value = isActive;
       console.log("Avatar glow rotate input updated:", isActive);
     }
-  }, [isActive, isProcessing, avatarInput, glowInput, voiceControlInput, glowRotateInput]);
+  }, [
+    isActive,
+    isProcessing,
+    avatarInput,
+    glowInput,
+    voiceControlInput,
+    glowRotateInput,
+  ]);
 
   return (
     <div
@@ -90,8 +116,8 @@ const RiveAvatar = ({ isActive, isProcessing }: { isActive: boolean; isProcessin
       )}
       <RiveComponent
         style={{
-          width: "100px",
-          height: "100px",
+          width: "140px",
+          height: "140px",
           position: "relative",
           zIndex: 10,
           filter: isProcessing
@@ -135,7 +161,7 @@ export default function ChatBotWithVoice() {
   }, []);
 
   const { rive, RiveComponent } = useRive({
-    src: "https://public.rive.app/community/runtime-files/21478-40369-ai-voice-tm.riv",
+    src: "https://public.rive.app/community/runtime-files/21478-40413-ai-voice-tm.riv",
     stateMachines: STATE_MACHINE,
     autoplay: true,
     onStateChange: (event) => {
@@ -148,14 +174,39 @@ export default function ChatBotWithVoice() {
       console.log("Main Rive component loaded successfully");
     },
   });
-
-  const listeningInput = useStateMachineInput(rive, STATE_MACHINE, LISTENING_INPUT);
+  useEffect(() => {
+    if (rive && rive.stateMachineInputs) {
+      const inputs = rive.stateMachineInputs(STATE_MACHINE) || [];
+      console.log(
+        "🧪 Available Inputs:",
+        inputs.map((input) => input.name)
+      );
+    }
+  }, [rive]);
+  const listeningInput = useStateMachineInput(
+    rive,
+    STATE_MACHINE,
+    LISTENING_INPUT
+  );
   const glowInput = useStateMachineInput(rive, STATE_MACHINE, GLOW_INPUT);
-  const voiceControlInput = useStateMachineInput(rive, STATE_MACHINE, VOICE_CONTROL_INPUT);
-  const glowRotateInput = useStateMachineInput(rive, STATE_MACHINE, GLOW_ROTATE_INPUT);
+  const voiceControlInput = useStateMachineInput(
+    rive,
+    STATE_MACHINE,
+    VOICE_CONTROL_INPUT
+  );
+  const glowRotateInput = useStateMachineInput(
+    rive,
+    STATE_MACHINE,
+    GLOW_ROTATE_INPUT
+  );
 
   const updateRiveInputs = useCallback(
-    (listening: boolean, glow: boolean, voiceControl: number, glowRotate: boolean) => {
+    (
+      listening: boolean,
+      glow: boolean,
+      voiceControl: number,
+      glowRotate: boolean
+    ) => {
       try {
         if (listeningInput && listeningInput.value !== undefined) {
           listeningInput.value = listening;
@@ -183,7 +234,7 @@ export default function ChatBotWithVoice() {
   useEffect(() => {
     if (!rive) return;
     if (isRecording) {
-      updateRiveInputs(true, true, 30, true);
+      updateRiveInputs(true, true, 50, true);
     } else if (isProcessing) {
       updateRiveInputs(true, false, 0, false);
     } else {
@@ -194,20 +245,30 @@ export default function ChatBotWithVoice() {
   const startListening = async () => {
     console.log("startListening called");
     // @ts-expect-error: webkitSpeechRecognition is not in TS types but needed for Safari
-    const SpeechRecognitionClass = window.webkitSpeechRecognition || window.SpeechRecognition;
+    const SpeechRecognitionClass =
+      window.webkitSpeechRecognition || window.SpeechRecognition;
 
     if (!SpeechRecognitionClass) {
       console.error("SpeechRecognition not supported");
-      alert("Speech Recognition not supported in this browser. Please use Chrome, Edge, or Safari.");
+      alert(
+        "Speech Recognition not supported in this browser. Please use Chrome, Edge, or Safari."
+      );
       return;
     }
-    console.log("SpeechRecognitionClass available:", SpeechRecognitionClass.name);
+    console.log(
+      "SpeechRecognitionClass available:",
+      SpeechRecognitionClass.name
+    );
 
     try {
-      const permissionStatus = await navigator.permissions.query({ name: "microphone" });
+      const permissionStatus = await navigator.permissions.query({
+        name: "microphone",
+      });
       console.log("Microphone permission status:", permissionStatus.state);
       if (permissionStatus.state === "denied") {
-        alert("Microphone access is denied. Please enable it in your browser settings.");
+        alert(
+          "Microphone access is denied. Please enable it in your browser settings."
+        );
         return;
       }
     } catch (error) {
@@ -218,7 +279,7 @@ export default function ChatBotWithVoice() {
 
     setIsRecording(true);
     setShowRiveAnimation(true);
-    updateRiveInputs(true, true, 30, true);
+    updateRiveInputs(true, true, 50, true);
 
     const recognition = new SpeechRecognitionClass();
     recognition.lang = "en-US";
@@ -229,11 +290,14 @@ export default function ChatBotWithVoice() {
     recognition.onstart = () => {
       console.log("Speech recognition started");
       if (!isMountedRef.current) return;
-      updateRiveInputs(true, true, 30, true);
+      updateRiveInputs(true, true, 50, true);
     };
 
     recognition.onresult = async (event: any) => {
-      console.log("Speech recognition result received:", event.results[0][0].transcript);
+      console.log(
+        "Speech recognition result received:",
+        event.results[0][0].transcript
+      );
       if (!isMountedRef.current) return;
 
       const transcript = event.results[0][0].transcript;
@@ -260,7 +324,8 @@ export default function ChatBotWithVoice() {
         "Got it! Let me help you with that.",
       ];
 
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      const randomResponse =
+        responses[Math.floor(Math.random() * responses.length)];
       const botMessage: Message = {
         sender: "bot",
         text: randomResponse,
@@ -285,7 +350,8 @@ export default function ChatBotWithVoice() {
           errorText = "Microphone not detected. Please check your audio input.";
           break;
         case "not-allowed":
-          errorText = "Microphone access denied. Please allow microphone access.";
+          errorText =
+            "Microphone access denied. Please allow microphone access.";
           break;
         case "network":
           errorText = "Network error occurred. Karla check your connection.";
@@ -355,10 +421,16 @@ export default function ChatBotWithVoice() {
     updateRiveInputs(false, false, 0, false);
   };
 
-  const handleSendMessage = async (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const handleSendMessage = async (
+    e:
+      | React.KeyboardEvent<HTMLInputElement>
+      | React.MouseEvent<HTMLButtonElement>
+  ) => {
     console.log("handleSendMessage called");
-// Handling the event for both keyboard and mouse input
-    const isEnterKey = e.type === "keydown" && (e as React.KeyboardEvent<HTMLInputElement>).key === "Enter";
+    // Handling the event for both keyboard and mouse input
+    const isEnterKey =
+      e.type === "keydown" &&
+      (e as React.KeyboardEvent<HTMLInputElement>).key === "Enter";
     const isClick = e.type === "click";
 
     if ((isEnterKey || isClick) && inputText.trim()) {
@@ -387,7 +459,8 @@ export default function ChatBotWithVoice() {
         "Got it! Let me help you with that.",
       ];
 
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      const randomResponse =
+        responses[Math.floor(Math.random() * responses.length)];
       const botMessage: Message = {
         sender: "bot",
         text: randomResponse,
@@ -404,7 +477,7 @@ export default function ChatBotWithVoice() {
     console.log("handleVoiceInput called, isRecording:", isRecording);
     if (!isRecording) {
       setShowRiveAnimation(true); // Show Rive animation when mic is clicked
-      updateRiveInputs(true, true, 30, true);
+      updateRiveInputs(true, true, 200, true);
       startListening();
     } else {
       setShowRiveAnimation(false);
@@ -436,7 +509,9 @@ export default function ChatBotWithVoice() {
             <div
               key={msg.id}
               className={`flex items-start space-x-2 ${
-                msg.sender === "user" ? "justify-end flex-row-reverse space-x-reverse" : "justify-start"
+                msg.sender === "user"
+                  ? "justify-end flex-row-reverse space-x-reverse"
+                  : "justify-start"
               } animate-fade-in`}
             >
               <div className="flex-shrink-0">
@@ -452,7 +527,10 @@ export default function ChatBotWithVoice() {
                     }}
                     className="relative"
                   >
-                    <RiveAvatar isActive={isProcessing || isRecording} isProcessing={isProcessing} />
+                    <RiveAvatar
+                      isActive={isProcessing || isRecording}
+                      isProcessing={isProcessing}
+                    />
                   </div>
                 )}
               </div>
@@ -464,10 +542,14 @@ export default function ChatBotWithVoice() {
                       : "bg-gray-800/70 text-gray-100 border border-gray-600/50 shadow-lg"
                   }`}
                 >
-                  <p className="text-sm leading-relaxed break-words font-medium">{msg.text}</p>
+                  <p className="text-sm leading-relaxed break-words font-medium">
+                    {msg.text}
+                  </p>
                   <p
                     className={`text-xs mt-2 font-medium ${
-                      msg.sender === "user" ? "text-blue-100/80" : "text-gray-400"
+                      msg.sender === "user"
+                        ? "text-blue-100/80"
+                        : "text-gray-400"
                     }`}
                   >
                     {formatTime(msg.timestamp)}
@@ -494,7 +576,9 @@ export default function ChatBotWithVoice() {
                 onClick={handleSendMessage}
                 disabled={isProcessing || isRecording || !inputText.trim()}
                 className={`px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl transition-all shadow-lg ${
-                  !inputText.trim() ? "opacity-50" : "hover:shadow-xl hover:scale-105"
+                  !inputText.trim()
+                    ? "opacity-50"
+                    : "hover:shadow-xl hover:scale-105"
                 } disabled:bg-gray-600 disabled:cursor-not-allowed border border-indigo-500/30`}
               >
                 <Send className="w-5 h-5 text-white" />
@@ -503,7 +587,9 @@ export default function ChatBotWithVoice() {
                 onClick={handleVoiceInput}
                 disabled={isProcessing}
                 className={`px-4 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 ${
-                  isProcessing ? "bg-gray-600 text-gray-300 cursor-not-allowed" : "text-white shadow-lg hover:shadow-xl"
+                  isProcessing
+                    ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                    : "text-white shadow-lg hover:shadow-xl"
                 } transform hover:scale-105 active:scale-95 transition-all border border-cyan-400/30`}
               >
                 <Mic className="w-6 h-6" />
