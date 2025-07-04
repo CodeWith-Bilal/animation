@@ -1,23 +1,7 @@
-// app/components/ChatBotWithVoice.jsx
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { useRive, useStateMachineInput } from "@rive-app/react-canvas";
+import React, { useEffect, useRef, useState } from "react";
 import { Mic, User, Volume2, Send } from "lucide-react";
-
-const STATE_MACHINE_1 = "State Machine 1";
-const STATE_MACHINE_2 = "State Machine 2";
-const LISTENING_INPUT = "start voice";
-const GLOW_INPUT = "glow";
-const VOICE_CONTROL_INPUT = "voice control";
-const GLOW_ROTATE_INPUT = "glow rotate";
-const BOUNCE_INPUT = "bounce";
-
-interface Message {
-  sender: string;
-  text: string;
-  timestamp: Date;
-  id: string;
-}
+import { useRive, useStateMachineInput } from "@rive-app/react-canvas";
 
 // Generate unique IDs to avoid collisions
 const generateUniqueId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -32,13 +16,28 @@ const formatTime = (date: Date) => {
   });
 };
 
+interface Message {
+  sender: string;
+  text: string;
+  timestamp: Date;
+  id: string;
+}
+
+const STATE_MACHINE_1 = "State Machine 1";
+const STATE_MACHINE_2 = "State Machine 2";
+const LISTENING_INPUT = "start voice";
+const GLOW_INPUT = "glow";
+const VOICE_CONTROL_INPUT = "voice control";
+const GLOW_ROTATE_INPUT = "glow rotate";
+const BOUNCE_INPUT = "bounce";
+
 // Separate RiveAvatar component to avoid nesting
 const RiveAvatar = ({
-  isActive,
+  isRecording,
   isProcessing,
   onClick,
 }: {
-  isActive: boolean;
+  isRecording: boolean;
   isProcessing: boolean;
   onClick?: () => void;
 }) => {
@@ -83,22 +82,22 @@ const RiveAvatar = ({
       console.log("Avatar start voice input updated: false");
     }
     if (glowInput) {
-      glowInput.value = isActive;
-      console.log("Avatar glow input updated:", isActive);
+      glowInput.value = false;
+      console.log("Avatar glow input updated: false");
     }
     if (voiceControlInput) {
-      voiceControlInput.value = isActive ? 200 : 0;
-      console.log("Avatar voice control input updated:", isActive ? 200 : 0);
+      voiceControlInput.value = 0;
+      console.log("Avatar voice control input updated: 0");
     }
     if (glowRotateInput) {
-      glowRotateInput.value = isActive;
-      console.log("Avatar glow rotate input updated:", isActive);
+      glowRotateInput.value = isRecording;
+      console.log("Avatar glow rotate input updated:", isRecording);
     }
     if (bounceInput) {
-      bounceInput.value = isActive;
-      console.log("Avatar bounce input updated:", isActive);
+      bounceInput.value = false;
+      console.log("Avatar bounce input updated: false");
     }
-  }, [isActive, isProcessing, avatarInput, glowInput, voiceControlInput, glowRotateInput, bounceInput]);
+  }, [isRecording, isProcessing, avatarInput, glowInput, voiceControlInput, glowRotateInput, bounceInput]);
 
   return (
     <div
@@ -167,87 +166,6 @@ export default function ChatBotWithVoice() {
     };
   }, []);
 
-    const { rive, RiveComponent } = useRive({
-    src: "/riv/t13.riv",
-    stateMachines: [STATE_MACHINE_1, STATE_MACHINE_2],
-    autoplay: true,
-    onLoadError: (error) => {
-      console.error("Avatar Rive load error:", error);
-    },
-    onLoad: () => {
-      console.log("Avatar Rive component loaded successfully");
-      if (rive) {
-        const inputs1 = rive.stateMachineInputs(STATE_MACHINE_1) || [];
-        const inputs2 = rive.stateMachineInputs(STATE_MACHINE_2) || [];
-        console.log(
-          `Avatar State Machine 1 inputs:`,
-          inputs1.map((input) => input.name),
-          `Total inputs: ${inputs1.length}`
-        );
-        console.log(
-          `Avatar State Machine 2 inputs:`,
-          inputs2.map((input) => input.name),
-          `Total inputs: ${inputs2.length}`
-        );
-      }
-    },
-    onStateChange: (event) => {
-      console.log("Avatar Rive state changed:", event.data);
-    },
-  });
-
-
-  const listeningInput = useStateMachineInput(rive, STATE_MACHINE_1, LISTENING_INPUT);
-  const glowInput = useStateMachineInput(rive, STATE_MACHINE_1, GLOW_INPUT);
-  const voiceControlInput = useStateMachineInput(rive, STATE_MACHINE_1, VOICE_CONTROL_INPUT);
-  const glowRotateInput = useStateMachineInput(rive, STATE_MACHINE_1, GLOW_ROTATE_INPUT);
-  const bounceInput = useStateMachineInput(rive, STATE_MACHINE_2, BOUNCE_INPUT);
-
-  const updateRiveInputs = useCallback(
-    (
-      listening: boolean,
-      glow: boolean,
-      voiceControl: number,
-      glowRotate: boolean,
-      bounce: boolean
-    ) => {
-      try {
-        if (listeningInput && listeningInput.value !== undefined) {
-          listeningInput.value = listening;
-          console.log("Main start voice input updated:", listening);
-        }
-        if (glowInput && glowInput.value !== undefined) {
-          glowInput.value = glow;
-          console.log("Main glow input updated:", glow);
-        }
-        if (voiceControlInput && voiceControlInput.value !== undefined) {
-          voiceControlInput.value = voiceControl;
-          console.log("Main voice control input updated:", voiceControl);
-        }
-        if (glowRotateInput && glowRotateInput.value !== undefined) {
-          glowRotateInput.value = glowRotate;
-          console.log("Main glow rotate input updated:", glowRotate);
-        }
-        if (bounceInput && bounceInput.value !== undefined) {
-          bounceInput.value = bounce;
-          console.log("Main bounce input updated:", bounce);
-        }
-      } catch (error) {
-        console.error("Error updating Rive inputs:", error);
-      }
-    },
-    [listeningInput, glowInput, voiceControlInput, glowRotateInput, bounceInput]
-  );
-
-  useEffect(() => {
-    if (!rive) return;
-    if (isProcessing) {
-      updateRiveInputs(false, false, 0, false, false);
-    } else {
-      updateRiveInputs(false, false, 0, false, false);
-    }
-  }, [isProcessing, rive, updateRiveInputs]);
-
   const startListening = async () => {
     console.log("startListening called");
     const SpeechRecognitionClass = window.webkitSpeechRecognition || window.SpeechRecognition;
@@ -290,12 +208,9 @@ export default function ChatBotWithVoice() {
       console.log("Speech recognition result received:", event.results[0][0].transcript);
       if (!isMountedRef.current) return;
 
-      // Set the transcript as inputText, but do not send
       setInputText(event.results[0][0].transcript);
-
       setIsRecording(false);
       setShowRiveAnimation(false);
-      updateRiveInputs(false, false, 0, false, false);
     };
 
     recognition.onerror = async (event: any) => {
@@ -333,7 +248,6 @@ export default function ChatBotWithVoice() {
       setIsProcessing(false);
       setIsRecording(false);
       setShowRiveAnimation(false);
-      updateRiveInputs(false, false, 0, false, false);
     };
 
     recognition.onend = () => {
@@ -341,7 +255,6 @@ export default function ChatBotWithVoice() {
       if (!isMountedRef.current) return;
       setIsRecording(false);
       setShowRiveAnimation(false);
-      updateRiveInputs(false, false, 0, false, false);
       recognitionRef.current = null;
     };
 
@@ -353,7 +266,6 @@ export default function ChatBotWithVoice() {
       console.error("Error starting speech recognition:", error);
       setIsRecording(false);
       setShowRiveAnimation(false);
-      updateRiveInputs(false, false, 0, false, false);
       setMessages((prev) => [
         ...prev,
         {
@@ -372,14 +284,6 @@ export default function ChatBotWithVoice() {
       recognitionRef.current.stop();
       recognitionRef.current = null;
     }
-  };
-
-  const stopRecording = () => {
-    console.log("stopRecording called");
-    if (!isMountedRef.current) return;
-    setIsRecording(false);
-    setShowRiveAnimation(false);
-    updateRiveInputs(false, false, 0, false, false);
   };
 
   const handleSendMessage = async (
@@ -435,7 +339,6 @@ export default function ChatBotWithVoice() {
       startListening();
     } else {
       setShowRiveAnimation(false);
-      updateRiveInputs(false, false, 0, false, false);
       stopListening();
     }
   };
@@ -480,7 +383,7 @@ export default function ChatBotWithVoice() {
                     className="relative"
                   >
                     <RiveAvatar
-                      isActive={isProcessing || isRecording}
+                      isRecording={isRecording}
                       isProcessing={isProcessing}
                       onClick={handleVoiceInput}
                     />
@@ -550,28 +453,11 @@ export default function ChatBotWithVoice() {
                   onClick={handleVoiceInput}
                   title="Click to start/stop recording"
                 >
-                  <div
-                    className="absolute inset-0 rounded-full animate-pulse"
-                    style={{
-                      background: `radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%)`,
-                      filter: `blur(15px)`,
-                      transform: `scale(1.2)`,
-                      borderRadius: "50%",
-                    }}
+                  <RiveAvatar
+                    isRecording={isRecording}
+                    isProcessing={isProcessing}
+                    onClick={handleVoiceInput}
                   />
-                  {RiveComponent && (
-                    <RiveComponent
-                      style={{
-                        width: "150px",
-                        height: "150px",
-                        position: "relative",
-                        zIndex: 10,
-                        filter: `drop-shadow(0 0 10px rgba(6, 182, 212, 0.5))`,
-                        background: "transparent",
-                        borderRadius: "50%",
-                      }}
-                    />
-                  )}
                 </div>
               )}
             </div>
