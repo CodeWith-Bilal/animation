@@ -42,7 +42,7 @@ const RiveAvatar = ({
   onClick?: () => void;
 }) => {
   const { rive, RiveComponent } = useRive({
-    src: "/riv/t13.riv",
+    src: "trailmate-ai-animation.riv",
     stateMachines: [STATE_MACHINE_1, STATE_MACHINE_2],
     autoplay: true,
     onLoadError: (error) => {
@@ -77,25 +77,22 @@ const RiveAvatar = ({
   const bounceInput = useStateMachineInput(rive, STATE_MACHINE_2, BOUNCE_INPUT);
 
   useEffect(() => {
-    if (avatarInput) {
-      avatarInput.value = false;
-      console.log("Avatar start voice input updated: false");
+    // Default all to false/0
+    if (avatarInput) avatarInput.value = false;
+    if (glowInput) glowInput.value = false;
+    if (voiceControlInput) voiceControlInput.value = 0;
+    if (glowRotateInput) glowRotateInput.value = false;
+    if (bounceInput) bounceInput.value = false;
+
+    // When AI is generating response, rotate
+    if (isProcessing && glowRotateInput) {
+      glowRotateInput.value = true;
+      console.log("Avatar glow rotate input updated: true (AI processing)");
     }
-    if (glowInput) {
-      glowInput.value = false;
-      console.log("Avatar glow input updated: false");
-    }
-    if (voiceControlInput) {
-      voiceControlInput.value = 0;
-      console.log("Avatar voice control input updated: 0");
-    }
-    if (glowRotateInput) {
-      glowRotateInput.value = isRecording;
-      console.log("Avatar glow rotate input updated:", isRecording);
-    }
-    if (bounceInput) {
-      bounceInput.value = false;
-      console.log("Avatar bounce input updated: false");
+    // When user is recording, bounce
+    if (isRecording && bounceInput) {
+      bounceInput.value = true;
+      console.log("Avatar bounce input updated: true (user recording)");
     }
   }, [isRecording, isProcessing, avatarInput, glowInput, voiceControlInput, glowRotateInput, bounceInput]);
 
