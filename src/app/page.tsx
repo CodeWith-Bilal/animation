@@ -77,17 +77,16 @@ const RiveAvatar = ({
   const bounceInput = useStateMachineInput(rive, STATE_MACHINE_2, BOUNCE_INPUT);
 
   useEffect(() => {
-    // Default all to false/0
+    // Default all to false/0 except glowRotateInput, which is only set by isProcessing
     if (avatarInput) avatarInput.value = false;
     if (glowInput) glowInput.value = false;
     if (voiceControlInput) voiceControlInput.value = 0;
-    if (glowRotateInput) glowRotateInput.value = false;
     if (bounceInput) bounceInput.value = false;
 
-    // When AI is generating response, rotate
-    if (isProcessing && glowRotateInput) {
-      glowRotateInput.value = true;
-      console.log("Avatar glow rotate input updated: true (AI processing)");
+    // When AI is generating response, rotate (glowRotateInput true), else false
+    if (glowRotateInput) {
+      glowRotateInput.value = !!isProcessing;
+      console.log("Avatar glow rotate input updated:", !!isProcessing);
     }
     // When user is recording, bounce
     if (isRecording && bounceInput) {
