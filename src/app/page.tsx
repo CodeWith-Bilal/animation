@@ -17,7 +17,6 @@ interface Message {
   id: string;
 }
 
-// Generate unique IDs to avoid collisions
 const generateUniqueId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // Format time consistently for server and client
@@ -30,7 +29,6 @@ const formatTime = (date: Date) => {
   });
 };
 
-// Separate RiveAvatar component to avoid nesting
 const RiveAvatar = ({ isActive, isProcessing }: { isActive: boolean; isProcessing: boolean }) => {
   const { rive, RiveComponent } = useRive({
     src: "https://public.rive.app/community/runtime-files/21478-40369-ai-voice-tm.riv",
